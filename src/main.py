@@ -14,7 +14,7 @@ def imageToAscii(image_path):
     image = image.resize((new_width, new_height))
 
     # Create a list of ASCII characters to represent the image, going from least to most light
-    ascii_characters = ".'`^\",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
+    ascii_characters = " .'`^\",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
     step = 255.0 / len(ascii_characters)
 
     # Convert the image to ASCII art
