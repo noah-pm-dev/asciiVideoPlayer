@@ -1,5 +1,5 @@
 from PIL import Image
-from sys import stdout
+from sys import stdout, argv
 from os import listdir, getcwd
 import time, subprocess, threading
 
@@ -42,16 +42,18 @@ def showFrame(text):
 def video():
     frames_path = getcwd() + '/video/img/'
     frames = listdir(frames_path)
+    fps = int(argv[1])
 
     start_time = time.time()
     frame = 0
-    for num in range(int(len(frames)/30)):
-        for i in range(30):
-            frame += 1
-            ascii = imageToAscii(frames_path + 'frame_%d.jpg' % (frame))
-            showFrame(ascii)
-            time.sleep(1/30.0 - (time.time() - start_time))
-            start_time = time.time()
+    for num in range(len(frames)):
+        frame += 1
+        ascii = imageToAscii(frames_path + 'frame_%d.jpg' % (frame))
+        showFrame(ascii)
+        time.sleep(1/fps - abs(time.time() - start_time))
+        start_time = time.time()
+
+
 
 def audio():
     audio_path = getcwd() + '/video/audio/'
