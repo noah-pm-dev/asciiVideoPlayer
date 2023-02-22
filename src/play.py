@@ -1,5 +1,6 @@
 from PIL import Image
 from sys import stdout, argv
+from sys import stdout, argv
 from os import listdir, getcwd
 import time, subprocess, threading
 
@@ -43,6 +44,7 @@ def video():
     frames_path = getcwd() + '/video/img/'
     frames = listdir(frames_path)
     fps = int(argv[1])
+    fps = int(argv[1])
 
     start_time = time.time()
     frame = 0
@@ -52,6 +54,8 @@ def video():
         showFrame(ascii)
         time.sleep(1/fps - abs(time.time() - start_time))
         start_time = time.time()
+
+
 
 
 
