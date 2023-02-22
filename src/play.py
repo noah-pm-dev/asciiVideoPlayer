@@ -48,7 +48,7 @@ def video():
     frame = 0
     for num in range(len(frames)):
         frame += 1
-        ascii = imageToAscii(frames_path + 'frame_%d.jpg' % (frame))
+        ascii = imageToAscii(frames_path + 'output_%d.jpg' % (frame))
         showFrame(ascii)
         time.sleep(1/fps - abs(time.time() - start_time))
         start_time = time.time()
