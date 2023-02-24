@@ -48,7 +48,7 @@ def header(frame, fps):
 
     ascii_frame_height = frame.count('\n')
 
-    header = 'fh' + str(ascii_frame_height) + 'fps' + str(fps)
+    header = 'fc' + str(len(os.listdir('tmp/frames/'))) + 'fh' + str(ascii_frame_height) + 'fps' + str(fps)
 
     putText(header)
     
