@@ -51,11 +51,10 @@ def splice(video):
     subprocess.run(['ffmpeg', '-i', video, '-vn', '-c:a', 'libvorbis', '-q:a', '5', 'tmp/audio/tmp_output.ogg']) # Splice out audio
     subprocess.run(['ffmpeg', '-i', video, '-q:v', '1', 'tmp/frames/tmp_frame_%d.jpg']) # Splice out frames
 
-def header(fps, video):
+def header(fps):
     '''Append the frame height and fps of video to start of ascv file'''
 
-    duration = float(subprocess.check_output(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', video]).decode('utf-8'))
-    header = str(fps) + '%!%' + str(duration) + '\n'
+    header = 'fps' + str(fps) + '\n'
 
     put_text(header)
     
@@ -90,7 +89,7 @@ with open(name + '.ascv', 'wb') as ascv:
         ascii = image_to_ascii(('tmp/frames/tmp_frame_%d.jpg' % (frame_num)))
 
         if frame_num == 1:
-            header(argv[2], argv[1])
+            header(argv[2])
         
         put_text(ascii)
 

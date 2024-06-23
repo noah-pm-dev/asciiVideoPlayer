@@ -29,8 +29,7 @@ def v(frames, fps, print_time):
 
 def video_init(data):
     header, frames = data.decode().split('\n', 1)
-    header = header.split('%!%', 1)
-    return [frame for frame in frames.split('f#e!')], int(header[0]), float(header[1].rstrip())
+    return [frame for frame in frames.split('f#e!')], int(header.split('fps', 1)[1])
 
 def a(audio):
     play(audio)
@@ -45,7 +44,7 @@ with open(ascv, 'rb') as av:
     b = av.read()
     video, audio = [i for i in b.split(bytes('v#e!', 'utf-8'))]
 
-frames, fps, duration = video_init(video)
+frames, fps = video_init(video)
 
 audio_segment = AudioSegment.from_file(BytesIO(audio), format="ogg").set_sample_width(2)
 
