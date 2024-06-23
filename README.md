@@ -21,3 +21,7 @@ The encoder will output a `.ascv` file. Play this file with:
 ```
 python3 src/play.py video.ascv
 ```
+The `.ascv` file contains both video and audio.
+
+
+#### A sample `.ascv` of the "Bad Apple" music video is included in the repository.
