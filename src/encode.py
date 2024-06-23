@@ -6,6 +6,8 @@ from re import sub
 PROGRESS_BAR = "[..................................................]"
 
 def compress(string):
+    '''Finds any character followed by at least 2 more of the same character,
+    then substitutes it for {count}{char}, e.g. ##### becomes 5#'''
     return sub(r'(.)\1{2,}', lambda match: f'{len(match.group(0))}{match.group(0)[0]}', string)
 
 def image_to_ascii(image_path):
@@ -14,11 +16,16 @@ def image_to_ascii(image_path):
     image = Image.open(image_path)
     
     # Resize the image to fit the terminal window
-    vw, vh = [os.get_terminal_size().columns, os.get_terminal_size().lines]
-    v_aspect_ratio = vw/vh
-    image_aspect_ratio = image.width/image.height
-    if image_aspect_ratio > v_aspect_ratio:
+    vw, vh = [os.get_terminal_size().columns, os.get_terminal_size().lines] # Get width (vw) and height (vh) of terminal
+    v_aspect_ratio = vw/vh # Terminal aspect ratio
+    image_aspect_ratio = image.width/image.height # Image aspect ratio
+    
+    # If the image's aspect ratio is larger than the terminal, then image.width > vw, 
+    # so scale the width
+    if image_aspect_ratio > v_aspect_ratio: 
         scaling_factor = vw/image.width
+    
+    # Otherwise, scale the height
     elif image_aspect_ratio <= v_aspect_ratio:
         scaling_factor = vh/image.height
     
@@ -27,23 +34,26 @@ def image_to_ascii(image_path):
     image = image.resize((new_width, new_height))
 
     # Create a list of ASCII characters to represent the image, going from least to most light
+    # The list excludes integers to not mess up compression
     ascii_characters = " .'`^\",:;Il!i><~+_-?][}{)(|\/tfjrxnuvczXYUJCLQOZmwqpdbkhao*#MW&%B@$"
-    step = 255.0 / len(ascii_characters)
 
-    # Convert the image to ASCII art
+    step = 255.0 / len(ascii_characters) # The step is the slice of the grayscale spectrum each ascii character represents
+
+    # Convert the image to ASCII
     ascii_image = []
-    for y in range(image.height):
+    for y in range(image.height): # Iterate through rows
         row = ""
-        for x in range(image.width):
-            r, g, b = image.getpixel((x, y))
-            gray = int(0.2989 * r + 0.5870 * g + 0.1140 * b)
-            index = int(gray / step)
-            row += ascii_characters[index] * 2
+        for x in range(image.width): # Iterate through pixels in row
+            r, g, b = image.getpixel((x, y)) # Get rgb value of pixel as three separate variables
+            gray = int(0.2989 * r + 0.5870 * g + 0.1140 * b) # Formula for converting to grayscale
+            index = int(gray / step) # Choose ascii character
+            row += ascii_characters[index] * 2 # Add two copies of chosen character to row, so each pixel = two characters
         ascii_image.append(row)
 
     # Assemble string from rows
     string = '\n'.join(ascii_image)
     
+    # Return compressed frame with frame end indicator
     return compress(string) + '\nf#e!'
 
 def splice(video):
@@ -56,7 +66,7 @@ def splice(video):
     subprocess.run(['ffmpeg', '-i', video, '-q:v', '1', 'tmp/frames/tmp_frame_%d.jpg']) # Splice out frames
 
 def header(fps):
-    '''Append the frame height and fps of video to start of ascv file'''
+    '''Append the fps to start of ascv file'''
 
     header = 'fps' + str(fps) + '\n'
 
@@ -64,25 +74,31 @@ def header(fps):
     
 
 def put_text(text):
+    '''Write given text as bytes to ascv'''
+
     ascv.write(bytes(text, 'utf-8'))
 
 def write_audio(audio):
+    '''Read bytes of given audio and write to ascv, preceded by video end indicator'''
+
     with open(audio, 'rb') as a:
         audio_bytes = a.read()
     
     ascv.write(bytes('v#e!', 'utf-8') + audio_bytes)
 
 def update_progress(count):
+    '''Update progress bar with number of cells filled equal to count'''
+
     stdout.write('\r')
     stdout.write(PROGRESS_BAR.replace('.', '=', count))
     stdout.flush()
 
-name = argv[1].split('.', 1)[0]
+name = argv[1].split('.', 1)[0] # Get name of video file
 
 splice(argv[1])
 
-frames = len(os.listdir('tmp/frames/'))
-progress_fraction = round(frames/50)
+frames = len(os.listdir('tmp/frames/')) # Number of frames
+progress_fraction = round(frames/50) # Number of frames per cell of progress bar
 
 stdout.write('\n' + 'WRITING FRAMES' + '\n' + PROGRESS_BAR)
 stdout.flush()
@@ -97,6 +113,7 @@ with open(name + '.ascv', 'wb') as ascv:
         
         put_text(ascii)
 
+        # If correct number of frames have been written, add one cell to progress bar
         if (frame_num) % progress_fraction == 0:
             count += 1
             update_progress(count)
