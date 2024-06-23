@@ -24,6 +24,8 @@ def v(frames, fps, print_time):
             start = time()
         show_frame(frame)
         sleep((1/correctedfps) - print_time)
+    
+    stdout.write('\033[2J\033[h')
 
 def video_init(data):
     header, frames = data.decode().split('\n', 1)
@@ -53,6 +55,4 @@ playVideo = Thread(target=v, args=(frames, fps, print_time))
 playAudio = Thread(target=a, args=(audio_segment, ))
 playVideo.start()
 playAudio.start()
-
-
 

@@ -10,9 +10,16 @@ def image_to_ascii(image_path):
     image = Image.open(image_path)
     
     # Resize the image to fit the terminal window
-    new_width = 80
-    aspect_ratio = image.height / image.width
-    new_height = int(aspect_ratio * new_width)
+    vw, vh = [os.get_terminal_size().columns, os.get_terminal_size().lines]
+    v_aspect_ratio = vw/vh
+    image_aspect_ratio = image.width/image.height
+    if image_aspect_ratio > v_aspect_ratio:
+        scaling_factor = vw/image.width
+    elif image_aspect_ratio <= v_aspect_ratio:
+        scaling_factor = vh/image.height
+    
+    new_width = int(image.width * scaling_factor)
+    new_height = int(image.height * scaling_factor)
     image = image.resize((new_width, new_height))
 
     # Create a list of ASCII characters to represent the image, going from least to most light
@@ -48,7 +55,7 @@ def header(fps, video):
     '''Append the frame height and fps of video to start of ascv file'''
 
     duration = float(subprocess.check_output(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', video]).decode('utf-8'))
-    header = str(fps) + '%!%' + str(duration)
+    header = str(fps) + '%!%' + str(duration) + '\n'
 
     put_text(header)
     
