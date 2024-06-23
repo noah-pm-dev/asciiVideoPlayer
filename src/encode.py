@@ -1,8 +1,12 @@
 import os, shutil, subprocess
 from sys import argv, stdout
 from PIL import Image
+from re import sub
 
 PROGRESS_BAR = "[..................................................]"
+
+def compress(string):
+    return sub(r'(.)\1{2,}', lambda match: f'{len(match.group(0))}{match.group(0)[0]}', string)
 
 def image_to_ascii(image_path):
     '''Converts an image to ascii'''
@@ -23,7 +27,7 @@ def image_to_ascii(image_path):
     image = image.resize((new_width, new_height))
 
     # Create a list of ASCII characters to represent the image, going from least to most light
-    ascii_characters = " .'`^\",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
+    ascii_characters = " .'`^\",:;Il!i><~+_-?][}{)(|\/tfjrxnuvczXYUJCLQOZmwqpdbkhao*#MW&%B@$"
     step = 255.0 / len(ascii_characters)
 
     # Convert the image to ASCII art
@@ -40,7 +44,7 @@ def image_to_ascii(image_path):
     # Assemble string from rows
     string = '\n'.join(ascii_image)
     
-    return string + '\nf#e!'
+    return compress(string) + '\nf#e!'
 
 def splice(video):
     '''Splits video into audio and frames'''

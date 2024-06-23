@@ -4,6 +4,10 @@ from threading import Thread
 from pydub import AudioSegment
 from pydub.playback import play
 from io import BytesIO
+from re import sub
+
+def decompress(frame):
+    return sub(r'(\d+)(.)', lambda match: match.group(2) * int(match.group(1)), frame)
 
 def test_print_time(frame):
     start = time()
@@ -11,6 +15,7 @@ def test_print_time(frame):
     return time() - start
 
 def show_frame(text):
+    stdout.write('\033[2J')
     stdout.write('\033[H')
     stdout.write(text)
 
@@ -25,11 +30,11 @@ def v(frames, fps, print_time):
         show_frame(frame)
         sleep((1/correctedfps) - print_time)
     
-    stdout.write('\033[2J\033[h')
+    stdout.write('\033[2J\033[H')
 
 def video_init(data):
     header, frames = data.decode().split('\n', 1)
-    return [frame for frame in frames.split('f#e!')], int(header.split('fps', 1)[1])
+    return [decompress(frame) for frame in frames.split('f#e!')], int(header.split('fps', 1)[1])
 
 def a(audio):
     play(audio)
