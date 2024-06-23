@@ -1,49 +1,52 @@
 from sys import stdout, argv
-from sys import stdout, argv
-from os import listdir, getcwd
-import time, subprocess, threading, re
+from time import sleep, time
+from threading import Thread
+from pydub import AudioSegment
+from pydub.playback import play
+from io import BytesIO
 
-def showFrame(text):
-    stdout.write('\033[3J')
+def test_print_time(frame):
+    start = time()
+    show_frame(frame)
+    return time() - start
+
+def show_frame(text):
     stdout.write('\033[H')
     stdout.write(text)
 
-def video(ascv):
-    with open(ascv, 'rb') as av:
-        frame_count = re.search(r'(?<=fc)\d+', av.read())
-        frame_height = re.search(r'(?<=fh)\d+', av.read())
-        print(frame_count, ';', frame_height)
+def v(frames, fps, print_time):  
+    for frame in frames:
+        show_frame(frame)
+        sleep((1/fps) - print_time)
 
-        frames = []
-        line = None
-        for line_num, line in enumerate(av):
-            if line_num == 0:
-                continue
-            elif bytes('ae', 'utf-8') in line:
-                break
-            else:
-                frames.append(line)
+def a(audio):
+    play(audio)
+
+def video_init(data):
+    header, frames = data.decode().split('\n', 1)
+    return [frame for frame in frames.split('f#e!')], int(header.split('fps', 1)[1].rstrip())
+
+def audio_init(audio):
+    return AudioSegment.from_file(BytesIO(audio), format="ogg").set_sample_width(2)
+
+
     
-    for f in range(0, frame_count, frame_height):
-        frame = ''
-        for l in range(frame_height):
-            frame += frames[l]
-            frames.pop(l)
-        
-        showFrame(frame)
-
-
-
-
-#def audio(ascv):
-
 
 ascv = argv[1]
 
-playVideo = threading.Thread(target=video(ascv))
-#playAudio = threading.Thread(target=audio(ascv))
+with open(ascv, 'rb') as av:
+    b = av.read()
+    video, audio = [i for i in b.split(bytes('v#e!', 'utf-8'))]
+
+frames, fps = video_init(video)
+audio_segment = audio_init(audio)
+
+print_time = test_print_time(frames[0])
+
+playVideo = Thread(target=v, args=(frames, fps, print_time))
+playAudio = Thread(target=a, args=(audio_segment, ))
 playVideo.start()
-#playAudio.start()
+playAudio.start()
 
 
 
