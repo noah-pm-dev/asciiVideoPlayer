@@ -16,10 +16,9 @@ def image_to_ascii(image_path):
     image = Image.open(image_path)
     
     # Resize the image to fit the terminal window
-    vw, vh = [os.get_terminal_size().columns, os.get_terminal_size().lines] # Get width (vw) and height (vh) of terminal
+    vw, vh = [os.get_terminal_size().columns/2, os.get_terminal_size().lines] # Get width (vw) and height (vh) of terminal
     v_aspect_ratio = vw/vh # Terminal aspect ratio
     image_aspect_ratio = image.width/image.height # Image aspect ratio
-    
     # If the image's aspect ratio is larger than the terminal, then image.width > vw, 
     # so scale the width
     if image_aspect_ratio > v_aspect_ratio: 
@@ -31,6 +30,9 @@ def image_to_ascii(image_path):
     
     new_width = int(image.width * scaling_factor)
     new_height = int(image.height * scaling_factor)
+    # print('vw:', vw, ';vh:', vh, ';imgwidth:', image.width, ';imgheight:', image.height)
+    # print('newW:', new_width, 'newH:', new_height)
+    # exit(0)
     image = image.resize((new_width, new_height))
 
     # Create a list of ASCII characters to represent the image, going from least to most light
@@ -93,7 +95,21 @@ def update_progress(count):
     stdout.write(PROGRESS_BAR.replace('.', '=', count))
     stdout.flush()
 
+# color = False
+
+# for arg in argv:
+#     if '.' in arg:
+#         name = arg.split('.', 1)[0]
+#     elif arg == '-c':
+#         color = True
+#         print("color")
+#         exit(0)
+#     elif isinstance(int(arg), int):
+#         fps = arg
+
 name = argv[1].split('.', 1)[0] # Get name of video file
+
+
 
 splice(argv[1])
 

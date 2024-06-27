@@ -14,7 +14,7 @@ def decompress(frame):
 def show_frame(text):
     '''Clears screen and displays frame'''
 
-    stdout.write('\033[2J\033[H') # Clear the screen and reset cursor to home 
+    stdout.write('\033[2J\033[3J\033[H') # Clear the screen and reset cursor to home 
     stdout.write(text) # Print frame
 
 def v(frames, fps):
@@ -35,7 +35,7 @@ def v(frames, fps):
         sleep(1/correctedfps)
     
     # Clear the screen and reset cursor to home after video is done
-    stdout.write('\033[2J\033[H')
+    stdout.write('\033[3J\033[H')
 
 def video_init(data):
     '''Separates the header and video data, returns a list of frames split at the frame end indicator, along with the integer fps value'''
@@ -60,6 +60,7 @@ with open(ascv, 'rb') as av:
     video, audio = [i for i in b.split(bytes('v#e!', 'utf-8'))] # Split video and audio at video end indicator
 
 frames, fps = video_init(video)
+
 
 # Create AudioSegment from audio bytes
 audio_segment = AudioSegment.from_file(BytesIO(audio), format="ogg").set_sample_width(2) 
