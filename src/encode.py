@@ -30,9 +30,7 @@ def image_to_ascii(image_path):
     
     new_width = int(image.width * scaling_factor)
     new_height = int(image.height * scaling_factor)
-    # print('vw:', vw, ';vh:', vh, ';imgwidth:', image.width, ';imgheight:', image.height)
-    # print('newW:', new_width, 'newH:', new_height)
-    # exit(0)
+
     image = image.resize((new_width, new_height))
 
     # Create a list of ASCII characters to represent the image, going from least to most light
